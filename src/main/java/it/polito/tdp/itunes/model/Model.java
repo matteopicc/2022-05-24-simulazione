@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
@@ -17,7 +18,50 @@ public class Model {
 	private Graph<Track,DefaultWeightedEdge>grafo;
 	private Map<Integer,Track>idMap;
 	
-	 public Model() {
+	private List<Track> listaMigliore;
+	
+	public List<Track>cercaLista(Track c, int m){
+		//recupero la componente connessa di c
+		List<Track>canzoniValide = new ArrayList<>();
+		ConnectivityInspector<Track,DefaultWeightedEdge>ci = new ConnectivityInspector<>(this.grafo);
+		canzoniValide.addAll(ci.connectedSetOf(c));
+		
+		List<Track>parziale = new ArrayList<>();
+		listaMigliore = new ArrayList<>();	
+		parziale.add(c);
+		cerca(parziale,canzoniValide,m);
+		
+		return listaMigliore;	
+	}
+	
+	
+	 private void cerca(List<Track> parziale, List<Track> canzoniValide, int m) {
+		 
+		//controllo soluzione migliore
+		 if(parziale.size()>listaMigliore.size()) {
+			 listaMigliore = new ArrayList<>(parziale);
+		 }
+		 
+		 
+		for(Track t: canzoniValide) {
+			if(!parziale.contains(t) && (sommaMemoria(parziale)+t.getBytes())<= m) {
+			parziale.add(t);
+			cerca(parziale,canzoniValide,m);
+			parziale.remove(parziale.size()-1);
+			}
+		}
+	}
+	 
+	 private int sommaMemoria(List<Track> canzoni) {
+		 int somma = 0;
+		 for(Track t: canzoni) {
+			 somma += t.getBytes();
+		 }
+		 return somma;
+	 }
+
+
+	public Model() {
 		dao = new ItunesDAO();
 		idMap = new HashMap<>();
 		
@@ -44,6 +88,10 @@ public class Model {
 		System.out.println("Grafo creato!");
 		System.out.println("# Vertici: "+this.grafo.vertexSet().size());
 		System.out.println("# Archi: "+this.grafo.edgeSet().size());
+	}
+	
+	public List<Track> getVertici(){
+		return new ArrayList<>(this.grafo.vertexSet());
 	}
 	
 	public List<Adiacenza>getDeltaMassimo(){

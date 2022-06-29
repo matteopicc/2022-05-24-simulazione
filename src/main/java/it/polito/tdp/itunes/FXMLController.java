@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import it.polito.tdp.itunes.model.Adiacenza;
 import it.polito.tdp.itunes.model.Genre;
 import it.polito.tdp.itunes.model.Model;
+import it.polito.tdp.itunes.model.Track;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -37,7 +38,7 @@ public class FXMLController {
     private Button btnMassimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCanzone"
-    private ComboBox<?> cmbCanzone; // Value injected by FXMLLoader
+    private ComboBox<Track> cmbCanzone; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGenere"
     private ComboBox<Genre> cmbGenere; // Value injected by FXMLLoader
@@ -50,6 +51,28 @@ public class FXMLController {
 
     @FXML
     void btnCreaLista(ActionEvent event) {
+    	txtResult.clear();
+    	Track c = this.cmbCanzone.getValue();
+    	if(c == null) {
+    		txtResult.appendText("Errore: scegliere una canzone dal menu\n");
+    		return;
+    	}
+    	int m;
+    	try {
+    		m = Integer.parseInt(txtMemoria.getText());
+    		
+    		if(this.model.grafoCreato() == false) {
+        		txtResult.appendText("Prima di esercitare questa funzione bisogna creare il grafico\n");
+        		return;
+        	}
+    		txtResult.appendText("LISTA CANZONI MIGLIORE: \n");
+    		for(Track t : this.model.cercaLista(c,m)) {
+    			txtResult.appendText(t+"\n");
+    		}
+    		
+    	}catch(NumberFormatException e) {
+    		txtResult.appendText("Errore: inserire un valore numerico per la memoria limite\n");
+    	}
 
     }
 
@@ -66,6 +89,7 @@ public class FXMLController {
     	txtResult.appendText("#VERTICI:"+this.model.nVertici()+"\n");
     	txtResult.appendText("#ARCHI:"+this.model.nArchi()+"\n");
     	
+    	this.cmbCanzone.getItems().addAll(this.model.getVertici());
 
     }
 
