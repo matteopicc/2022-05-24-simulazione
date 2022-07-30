@@ -19,7 +19,7 @@ public class Model {
 	private Map<Integer,Track>idMap;
 	
 	private List<Track> listaMigliore;
-	int c=0;
+	int c;
 	
 	public List<Track>cercaLista(Track c, int m){
 		//recupero la componente connessa di c
